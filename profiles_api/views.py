@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from profiles_api.models import UserProfile
-from .serializers import HelloSerializers, UserProfileSerializer
+from profiles_api.models import ProfileFeedItem, UserProfile
+from .serializers import HelloSerializers, ProfileFeedItemSerializer, UserProfileSerializer
 from rest_framework import viewsets,filters
 from . import permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.permissions import IsAuthenticated
 
 
 
@@ -69,8 +70,18 @@ class LoginViewSet(viewsets.ViewSet):
 
     serializer_class=AuthTokenSerializer
 
-    def create(self,request):
+    def create(self, request):
         return ObtainAuthToken().as_view()(request=request._request)
+
+class ProfileFeedItemViewSets(viewsets.ModelViewSet):
+    queryset=ProfileFeedItem.objects.all()
+    authentication_classes=[TokenAuthentication,]
+    permission_classes =[permissions.PostonOwnProfile,IsAuthenticated]
+    serializer_class=ProfileFeedItemSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user_profile=self.request.user)
+
     
 
  

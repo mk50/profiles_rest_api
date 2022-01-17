@@ -1,5 +1,6 @@
 from os import name
-from attr import fields
+from pyexpat import model
+from django.forms import fields
 from rest_framework import serializers
 from .models import *
 class HelloSerializers(serializers.Serializer):
@@ -25,3 +26,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
             password=validated_data.pop('password')
             instance.set_password(password)
         return super().update(instance, validated_data)
+class ProfileFeedItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=ProfileFeedItem
+        fields=['id','user_profile','status_txt','created_on']
+        extra_kwargs={'user_profile':{'read_only':True}}
+        
